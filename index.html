@@ -1,0 +1,98 @@
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<style>
+    * {
+        border: 1px dashed red
+    }
+
+    body {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        height: 100%;
+    }
+
+    .space-bar {
+        color: white;
+        text-decoration: underline;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 40px;
+        width: 90vw;
+        height: 80px;
+        background: linear-gradient(-0.5deg, gray, black 30%, gray);
+        border-radius: 40px;
+    }
+
+    .space-bar.up {
+        background: linear-gradient(-0.5deg, gray, black 30%, gray);
+    }
+
+    .space-bar.down {
+        width: 81vw;
+        height: 9vh;
+        min-height: 68px;
+        background: linear-gradient(-0.5deg, gray, black 30%, 25% darkgray, black);
+    }
+</style>
+
+<main>
+    <h1 class="score">X</h1>
+    <div class="space-bar up">SPACEBAR</div>
+    <h2 class="achievements">Achievements</h2>
+</main>
+
+<script>
+    let down_state = false;
+
+    function callBack(message) {
+        console.log(`Message :: ${message}`);
+    }
+
+    function spaceDown() {
+        callBack('Space down.');
+    }
+
+    function spaceUp() {
+        callBack('Space up.');
+    }
+
+    spaceEventTargets = Array.from(document.querySelectorAll('.space-bar'));
+
+    ['keydown', 'mousedown'].forEach(
+        (eventType) => document.addEventListener(eventType, (event) => {
+            if (eventType == 'mousedown' && spaceEventTargets.includes(event.target)) {
+                // console.log(eventType);
+                down_state = true;
+                spaceDown()
+            }
+            if (eventType == 'keydown' && event.key == " " && !event.repeat) {
+                // console.log(`'${event.key}'`);
+                // console.log(event);
+                down_state = true;
+                spaceDown()
+            }
+        })
+    );
+
+    ['keyup', 'mouseup'].forEach(
+        (eventType) => document.addEventListener(eventType, (event) => {
+            if (eventType == 'mouseup' && spaceEventTargets.includes(event.target)) {
+                // console.log(eventType)
+                down_state = false;
+                spaceUp()
+            }
+            if (eventType == 'keyup' && event.key == " " && !event.repeat) {
+                // console.log(`'${event.key}'`);
+                down_state = false;
+                spaceUp()
+            }
+        }))
+</script>
