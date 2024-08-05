@@ -18,6 +18,15 @@
         height: 100%;
     }
 
+    .space-bar-container {
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
     .space-bar {
         color: white;
         text-decoration: underline;
@@ -29,6 +38,7 @@
         height: 80px;
         background: linear-gradient(-0.5deg, gray, black 30%, gray);
         border-radius: 40px;
+        user-select: none;
     }
 
     .space-bar.up {
@@ -39,29 +49,54 @@
         width: 81vw;
         height: 9vh;
         min-height: 68px;
+        font-size: 36px;
         background: linear-gradient(-0.5deg, gray, black 30%, 25% darkgray, black);
     }
 </style>
 
 <main>
     <h1 class="score">X</h1>
-    <div class="space-bar up">SPACEBAR</div>
+    <div class="space-bar-container">
+        <div class="space-bar up">SPACEBAR</div>
+    </div>
     <h2 class="achievements">Achievements</h2>
 </main>
 
 <script>
-    let down_state = false;
+    window.globalState = {
+        score: 0,
+    }
 
-    function callBack(message) {
+
+    function stateCallBack(newGameState = null, message = null) {
         console.log(`Message :: ${message}`);
+        Object.assign(window.globalState, newGameState);
+        const stateChangeEvent = new Event("gameStateChanged");
+        document.dispatchEvent(stateChangeEvent);
     }
 
-    function spaceDown() {
-        callBack('Space down.');
+    function updateScore() {
+        const score = window.globalState.score
+        elements = Array.from(document.querySelectorAll('.score'));
+        for (e of elements) {
+            e.innerText = score
+        }
     }
 
-    function spaceUp() {
-        callBack('Space up.');
+    function toggleSpaceButtonUp() {
+        elements = Array.from(document.querySelectorAll('.space-bar'));
+        for (e of elements) {
+            e.classList.add('up');
+            e.classList.remove('down');
+        }
+    }
+
+    function toggleSpaceButtonDown() {
+        elements = Array.from(document.querySelectorAll('.space-bar'));
+        for (e of elements) {
+            e.classList.add('down');
+            e.classList.remove('up');
+        }
     }
 
     spaceEventTargets = Array.from(document.querySelectorAll('.space-bar'));
@@ -69,30 +104,23 @@
     ['keydown', 'mousedown'].forEach(
         (eventType) => document.addEventListener(eventType, (event) => {
             if (eventType == 'mousedown' && spaceEventTargets.includes(event.target)) {
-                // console.log(eventType);
                 down_state = true;
-                spaceDown()
+                stateCallBack({ score: window.globalState.score + 1 }, "Space down.");
+                updateScore();
+                toggleSpaceButtonDown();
             }
             if (eventType == 'keydown' && event.key == " " && !event.repeat) {
-                // console.log(`'${event.key}'`);
-                // console.log(event);
                 down_state = true;
-                spaceDown()
+                stateCallBack({ score: window.globalState.score + 1 }, "Space down.");
+                updateScore();
+                toggleSpaceButtonDown();
             }
         })
     );
 
     ['keyup', 'mouseup'].forEach(
         (eventType) => document.addEventListener(eventType, (event) => {
-            if (eventType == 'mouseup' && spaceEventTargets.includes(event.target)) {
-                // console.log(eventType)
-                down_state = false;
-                spaceUp()
-            }
-            if (eventType == 'keyup' && event.key == " " && !event.repeat) {
-                // console.log(`'${event.key}'`);
-                down_state = false;
-                spaceUp()
-            }
-        }))
+            toggleSpaceButtonUp();
+        })
+    );
 </script>
